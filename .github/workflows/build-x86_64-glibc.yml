@@ -120,7 +120,7 @@ jobs:
       - name: Retrieve private key
         run: |
           cd ~
-          curl -O https://raw.githubusercontent.com/void-land/hyprland-void/master/pem/private.pem
+          curl -O https://raw.githubusercontent.com/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}/main/pem/private.pem
 
       - name: Sign repository
         run: |
