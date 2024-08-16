@@ -1,7 +1,7 @@
 # Template file for 'hyprland'
 pkgname=hyprland
-version=0.41.1
-revision=2
+version=0.42.0
+revision=1
 build_style=cmake
 configure_args=" --no-warn-unused-cli \
 	-DCMAKE_BUILD_TYPE:STRING=Release \
@@ -24,6 +24,7 @@ hstmkdeps="
 "
 hostmakedepends=$hstmkdeps
 makedepends="
+	aquamarine
 	cairo-devel
 	hwids
 	hyprcursor
@@ -37,6 +38,7 @@ makedepends="
 	libliftoff-devel
 	libseat-devel
 	libxcb-devel
+	libXcursor-devel
 	libxkbcommon-devel
 	pango-devel
 	tomlplusplus
@@ -53,7 +55,7 @@ license="BSD-3-Clause"
 homepage="https://hyprland.org/"
 changelog="https://github.com/hyprwm/Hyprland/releases"
 distfiles="https://github.com/hyprwm/Hyprland/releases/download/v${version}/source-v${version}.tar.gz"
-checksum="4572e3990a18de602410b422ae9232233f2a699b3d0132b90a6e1c25f7369a75"
+checksum=278c137ad28f5e4ef9d65032b18cb230799c982d008654a90b5060dd32eaa54a
 
 if [ "$XBPS_TARGET_LIBC" = "musl" ]; then
 	configure_args+=" -DCMAKE_CXX_FLAGS=\"-lexecinfo\""
@@ -61,27 +63,23 @@ if [ "$XBPS_TARGET_LIBC" = "musl" ]; then
 	depends+=" libexecinfo"
 fi
 
+do_patch() {
+	[ "$XBPS_TARGET_LIBC" = "musl" ] && patch -Np1 -i $FILESDIR/strncpy-include-cstring.patch -d $wrksrc || echo "Not on musl, skipping patch"
+}
+
 post_install() {
+	# license
 	vlicense LICENSE
 
+	# headers
 	vmkdir usr/include/hyprland
 	vmkdir usr/include/hyprland/protocols
-	vmkdir usr/include/hyprland/wlr
 	vmkdir usr/share/pkgconfig
 
 	cmake --build ./build --config Release --target generate-protocol-headers
 
 	find src -name '*.h*' -print0 | cpio --quiet -0dump ${DESTDIR}/usr/include/hyprland
-
-	pushd subprojects/wlroots-hyprland/include/wlr
-	find . -name '*.h*' -print0 | cpio --quiet -0dump ${DESTDIR}/usr/include/hyprland/wlr
-	popd
-
-	pushd subprojects/wlroots-hyprland/build/include
-	find . -name '*.h*' -print0 | cpio --quiet -0dump ${DESTDIR}/usr/include/hyprland/wlr
-	popd
-
-	install -Dm0644 protocols/*-protocol.h ${DESTDIR}/usr/include/hyprland/protocols
+	install -Dm0644 protocols/*.h* ${DESTDIR}/usr/include/hyprland/protocols
 	vinstall build/hyprland.pc 644 usr/share/pkgconfig
 }
 

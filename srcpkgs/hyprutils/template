@@ -1,14 +1,16 @@
 # Template file for 'hyprutils'
 pkgname=hyprutils
-version=0.1.2
+version=0.2.1
 revision=1
 build_style=cmake
+hostmakedepends="pkgconf"
+makedepends="pixman-devel"
 short_desc="A small C++ library used across the Hypr* ecosystem"
 maintainer="hesam-init <hesam.init@gmail.com>"
 license="BSD-3-Clause"
 homepage="https://github.com/hyprwm/hyprutils"
 distfiles="https://github.com/hyprwm/hyprutils/archive/refs/tags/v${version}.tar.gz"
-checksum="a11598fbba1dcb8e1f939935ed55339b481816b1fddc89dbbfe4dafb4d753562"
+checksum=061449c828d0cdaf7b147d9e232282fd0dde997c6ec7c43d51fe96d878b66c12
 
 post_install() {
 	vlicense LICENSE
