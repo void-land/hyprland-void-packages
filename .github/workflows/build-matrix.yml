@@ -37,51 +37,58 @@ jobs:
       PACKAGES_FILE: "packages-${{ matrix.arch }}.tar.gz"
 
     steps:
-      - name: checkout ${{ env.REPO_NAME }}
+      - name: Checkout ${{ env.REPO_NAME }}
         uses: actions/checkout@v4
         with:
           ref: main
           path: ${{ env.REPO_NAME }}
 
-      - name: checkout void-packages
+      - name: Checkout void-packages
         uses: actions/checkout@v4
         with:
           repository: void-linux/void-packages
           ref: master
           path: void-packages
 
-      - name: copy
-        run: |
-          cat ${{ env.REPO_NAME }}/common/shlibs >> void-packages/common/shlibs
-          cp -rv ${{ env.REPO_NAME }}/srcpkgs/* void-packages/srcpkgs
+      - name: Cache xbps-static and bootstrap
+        id: cache-void-packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            /opt/xbps
+            void-packages/masterdir-${{ matrix.arch }}
+            void-packages/hostdir
+          key: xbps-static-${{ matrix.arch }}-bootstrap-${{ hashFiles('void-packages/srcpkgs/*', 'void-packages/common/shlibs') }}
 
-      - name: prepare xbps-static
+      - name: Prepare xbps-static
+        if: steps.cache-void-packages.outputs.cache-hit != 'true'
         run: |
           mkdir -p /opt/xbps
           curl -LO http://repo-default.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz
           tar xvf xbps-static-latest.x86_64-musl.tar.xz -C /opt/xbps
           rm xbps-static-latest.x86_64-musl.tar.xz
 
-      - name: set path
+      - name: Set path
         run: |
           echo "/opt/xbps/usr/bin/" >> $GITHUB_PATH
 
-      - name: setup binary bootstrap
+      - name: Setup binary bootstrap
         working-directory: void-packages
+        if: steps.cache-void-packages.outputs.cache-hit != 'true'
         run: |
           ./xbps-src -m masterdir-${{ matrix.arch }} -A ${{ matrix.arch }} binary-bootstrap
 
-      - name: build ${{ matrix.package }}
+      - name: Build ${{ matrix.package }}
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} ${{ matrix.package }}
 
-      - name: package artifacts
+      - name: Package artifacts
         working-directory: void-packages/hostdir/binpkgs/
         run: |
           tar -czvf ~/${{ env.PACKAGES_FILE }} *.xbps
 
-      - name: upload package artifacts
+      - name: Upload package artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}-artifacts
