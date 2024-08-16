@@ -1,9 +1,10 @@
 name: Build and Release Hyprland Packages
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+    # branches:
+      # - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -37,63 +38,51 @@ jobs:
       PACKAGES_FILE: "packages-${{ matrix.arch }}.tar.gz"
 
     steps:
-      - name: Checkout ${{ env.REPO_NAME }}
+      - name: checkout ${{ env.REPO_NAME }}
         uses: actions/checkout@v4
         with:
           ref: main
           path: ${{ env.REPO_NAME }}
 
-      - name: Checkout void-packages
+      - name: checkout void-packages
         uses: actions/checkout@v4
         with:
           repository: void-linux/void-packages
           ref: master
           path: void-packages
 
-      - name: Cache void-packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            void-packages
-            /opt/xbps
-          key: ${{ runner.os }}-void-packages-${{ github.sha }}
-
-      - name: Copy files and prepare environment
+      - name: copy
         run: |
           cat ${{ env.REPO_NAME }}/common/shlibs >> void-packages/common/shlibs
           cp -rv ${{ env.REPO_NAME }}/srcpkgs/* void-packages/srcpkgs
 
-          if [ ! -d "/opt/xbps" ]; then
-            mkdir -p /opt/xbps
-            curl -LO http://repo-default.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz
-            tar xvf xbps-static-latest.x86_64-musl.tar.xz -C /opt/xbps
-            rm xbps-static-latest.x86_64-musl.tar.xz
-          fi
+      - name: prepare xbps-static
+        run: |
+          mkdir -p /opt/xbps
+          curl -LO http://repo-default.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz
+          tar xvf xbps-static-latest.x86_64-musl.tar.xz -C /opt/xbps
+          rm xbps-static-latest.x86_64-musl.tar.xz
 
+      - name: set path
+        run: |
           echo "/opt/xbps/usr/bin/" >> $GITHUB_PATH
 
-      - name: Cache binary bootstrap
-        uses: actions/cache@v3
-        with:
-          path: void-packages/masterdir-${{ matrix.arch }}
-          key: ${{ runner.os }}-binary-bootstrap-${{ matrix.arch }}-${{ github.sha }}
-
-      - name: Setup binary bootstrap
+      - name: setup binary bootstrap
         working-directory: void-packages
         run: |
           ./xbps-src -m masterdir-${{ matrix.arch }} -A ${{ matrix.arch }} binary-bootstrap
 
-      - name: Build ${{ matrix.package }}
+      - name: build ${{ matrix.package }}
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} ${{ matrix.package }}
 
-      - name: Package artifacts
+      - name: package artifacts
         working-directory: void-packages/hostdir/binpkgs/
         run: |
           tar -czvf ~/${{ env.PACKAGES_FILE }} *.xbps
 
-      - name: Upload package artifacts
+      - name: upload package artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}-artifacts
@@ -112,7 +101,8 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          path: ~/artifacts
+          name: ${{ matrix.package }}-artifacts
+          path: ~/
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -134,9 +124,7 @@ jobs:
 
       - name: Extract and Add Packages
         run: |
-          for artifact in ~/artifacts/*; do
-            tar -xvf "$artifact/${{ env.PACKAGES_FILE }}" -C ./
-          done
+          tar -xvf ~/${{ env.PACKAGES_FILE }} -C ./
 
       - name: Commit and Push Changes
         run: |
