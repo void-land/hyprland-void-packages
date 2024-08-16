@@ -62,11 +62,6 @@ jobs:
         run: |
           ./xbps-src -m masterdir-${{ matrix.arch }} -A ${{ matrix.arch }} binary-bootstrap
 
-      - name: build Swayosd
-        working-directory: void-packages
-        run: |
-         ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} swayosd
-
       - name: build tomlplusplus
         working-directory: void-packages
         run: |
@@ -126,6 +121,16 @@ jobs:
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprpaper
+
+      - name: build swayosd
+        working-directory: void-packages
+        run: |
+         ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} swayosd
+
+      - name: build rofi wayland
+        working-directory: void-packages
+        run: |
+         ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} rofi-wayland
 
       - name: sign
         working-directory: void-packages/hostdir/binpkgs/
