@@ -56,7 +56,7 @@ jobs:
           path: |
             void-packages
             /opt/xbps
-          key: ${{ runner.os }}-void-packages-${{ hashFiles('**/common/shlibs', '**/srcpkgs/**') }}
+          key: ${{ runner.os }}-void-packages-${{ github.sha }}
 
       - name: Copy files and prepare environment
         run: |
@@ -76,7 +76,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: void-packages/masterdir-${{ matrix.arch }}
-          key: ${{ runner.os }}-binary-bootstrap-${{ matrix.arch }}-${{ hashFiles('void-packages/xbps-src') }}
+          key: ${{ runner.os }}-binary-bootstrap-${{ matrix.arch }}-${{ github.sha }}
 
       - name: Setup binary bootstrap
         working-directory: void-packages
