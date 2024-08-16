@@ -1,0 +1,132 @@
+name: Build and Release Hyprland Packages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      max-parallel: 1
+      matrix:
+        arch: [x86_64]
+        package: [
+          "tomlplusplus",
+          "sdbus-cpp",
+          "hyprutils",
+          "hyprlang",
+          "hyprland",
+          "hyprland-protocols",
+          "xdg-desktop-portal-hyprland",
+          "hyprcursor",
+          "hyprwayland-scanner",
+          "hypridle",
+          "hyprlock",
+          "hyprpaper",
+          "swayosd",
+          "rofi-wayland"
+        ]
+    runs-on: ubuntu-latest
+    env:
+      XBPS_ALLOW_RESTRICTED: "yes"
+      XBPS_PASSPHRASE: ${{ secrets.SIGN_PASS }}
+      XBPS_TARGET_ARCH: ${{ matrix.arch }}
+      REPO_OWNER: "${{ github.repository_owner }}"
+      REPO_NAME: "${{ github.event.repository.name }}"
+      PACKAGES_FILE: "packages-${{ matrix.arch }}.tar.gz"
+
+    steps:
+      - name: checkout ${{ env.REPO_NAME }}
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: ${{ env.REPO_NAME }}
+
+      - name: checkout void-packages
+        uses: actions/checkout@v4
+        with:
+          repository: void-linux/void-packages
+          ref: master
+          path: void-packages
+
+      - name: copy
+        run: |
+          cat ${{ env.REPO_NAME }}/common/shlibs >> void-packages/common/shlibs
+          cp -rv ${{ env.REPO_NAME }}/srcpkgs/* void-packages/srcpkgs
+
+      - name: prepare xbps-static
+        run: |
+          mkdir -p /opt/xbps
+          curl -LO http://repo-default.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz
+          tar xvf xbps-static-latest.x86_64-musl.tar.xz -C /opt/xbps
+          rm xbps-static-latest.x86_64-musl.tar.xz
+
+      - name: set path
+        run: |
+          echo "/opt/xbps/usr/bin/" >> $GITHUB_PATH
+
+      - name: setup binary bootstrap
+        working-directory: void-packages
+        run: |
+          ./xbps-src -m masterdir-${{ matrix.arch }} -A ${{ matrix.arch }} binary-bootstrap
+
+      - name: build ${{ matrix.package }}
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} ${{ matrix.package }}
+
+      - name: package artifacts
+        working-directory: void-packages/hostdir/binpkgs/
+        run: |
+          tar -czvf ~/${{ env.PACKAGES_FILE }} *.xbps
+
+      - name: upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package }}-artifacts
+          path: ~/${{ env.PACKAGES_FILE }}
+
+  publish:
+    name: Pack and Publish
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      REPO_OWNER: "${{ github.repository_owner }}"
+      REPO_NAME: "${{ github.event.repository.name }}"
+      PACKAGES_FILE: "packages-x86_64.tar.gz"
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.package }}-artifacts
+          path: ~/
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update or Create Repository Branch
+        run: |
+          if git ls-remote --exit-code --heads origin repository-x86_64-glibc; then
+            echo "Branch exists, deleting it"
+            git push origin -d repository-x86_64-glibc
+          else
+            echo "Branch does not exist, will create new"
+          fi
+          git switch --orphan repository-x86_64-glibc
+
+      - name: Extract and Add Packages
+        run: |
+          tar -xvf ~/${{ env.PACKAGES_FILE }} -C ./
+
+      - name: Commit and Push Changes
+        run: |
+          git add -A
+          git commit -m "Upload latest packages to repository"
+          git push origin repository-x86_64-glibc
