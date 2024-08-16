@@ -1,6 +1,10 @@
 name: "Build Hyprland x86_64 Musl"
 
 on:
+  # push:
+  #   branches:
+      # - test
+      # - main
   workflow_dispatch:
 
 env:
