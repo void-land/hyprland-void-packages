@@ -14,6 +14,10 @@ To add this repository to xbps's repositories, create a configuration file `/etc
 echo 'repository=https://raw.githubusercontent.com/void-land/hyprland-void-packages/repository-x86_64-glibc' | sudo tee /etc/xbps.d/hyprland-void-repo.conf
 ```
 
+```sh
+echo 'repository=https://github.com/void-land/hyprland-void-packages/releases/latest/download/' | sudo tee /etc/xbps.d/hyprland-packages.conf
+```
+
 #### Installing Hyprland
 
 Once the repository is added, you can install Hyprland like any other program:

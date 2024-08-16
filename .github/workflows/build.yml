@@ -46,12 +46,12 @@ jobs:
           tar xvf xbps-static-latest.x86_64-musl.tar.xz -C /opt/xbps
           rm xbps-static-latest.x86_64-musl.tar.xz
 
-      # - name: free space
-      #   run: |
-      #     sudo rm -rf /usr/share/dotnet
-      #     sudo rm -rf /usr/local/lib/android
-      #     sudo rm -rf /opt/ghc
-      #     sudo rm -rf /opt/hostedtoolcache/CodeQL
+      - name: free space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
 
       - name: set path
         run: |
@@ -62,65 +62,65 @@ jobs:
         run: |
           ./xbps-src -m masterdir-${{ matrix.arch }} -A ${{ matrix.arch }} binary-bootstrap
 
-      # - name: build tomlplusplus
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} tomlplusplus
+      - name: build tomlplusplus
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} tomlplusplus
 
-      # - name: build sdbus-cpp
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} sdbus-cpp
+      - name: build sdbus-cpp
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} sdbus-cpp
 
-      # - name: build hyprutils
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprutils
+      - name: build hyprutils
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprutils
 
-      # - name: build hyprlang
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprlang
+      - name: build hyprlang
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprlang
 
-      # - name: build hyprland
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprland
+      - name: build hyprland
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprland
 
-      # - name: build hyprland-protocols
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprland-protocols
+      - name: build hyprland-protocols
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprland-protocols
 
-      # - name: build xdg-desktop-portal-hyprland
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} xdg-desktop-portal-hyprland
+      - name: build xdg-desktop-portal-hyprland
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} xdg-desktop-portal-hyprland
 
-      # - name: build hyprcursor
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprcursor
+      - name: build hyprcursor
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprcursor
 
-      # - name: build hyprwayland-scanner
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprwayland-scanner
+      - name: build hyprwayland-scanner
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprwayland-scanner
 
-      # - name: build hypridle
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hypridle
+      - name: build hypridle
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hypridle
 
-      # - name: build hyprlock
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprlock
+      - name: build hyprlock
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprlock
 
-      # - name: build hyprpaper
-      #   working-directory: void-packages
-      #   run: |
-      #     ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprpaper
+      - name: build hyprpaper
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprpaper
 
       - name: build swayosd
         working-directory: void-packages
