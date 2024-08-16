@@ -1,4 +1,4 @@
-name: Build void packages
+name: Build Hyprland Packages
 
 on:
   push:
@@ -62,67 +62,67 @@ jobs:
         run: |
           ./xbps-src -m masterdir-${{ matrix.arch }} -A ${{ matrix.arch }} binary-bootstrap
 
-      - name: Build Swayosd
+      - name: build Swayosd
         working-directory: void-packages
         run: |
          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} swayosd
 
-      - name: Build tomlplusplus
+      - name: build tomlplusplus
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} tomlplusplus
 
-      - name: Build sdbus-cpp
+      - name: build sdbus-cpp
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} sdbus-cpp
 
-      - name: Build hyprutils
+      - name: build hyprutils
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprutils
 
-      - name: Build hyprlang
+      - name: build hyprlang
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprlang
 
-      - name: Build hyprland
+      - name: build hyprland
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprland
 
-      - name: Build hyprland-protocols
+      - name: build hyprland-protocols
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprland-protocols
 
-      - name: Build xdg-desktop-portal-hyprland
+      - name: build xdg-desktop-portal-hyprland
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} xdg-desktop-portal-hyprland
 
-      - name: Build hyprcursor
+      - name: build hyprcursor
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprcursor
 
-      - name: Build hyprwayland-scanner
+      - name: build hyprwayland-scanner
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprwayland-scanner
 
-      - name: Build hypridle
+      - name: build hypridle
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hypridle
 
-      - name: Build hyprlock
+      - name: build hyprlock
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprlock
 
-      - name: Build hyprpaper
+      - name: build hyprpaper
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprpaper
@@ -135,12 +135,6 @@ jobs:
           xbps-rindex -S --privkey <(printf '%s' "${{ secrets.PRIV_KEY }}") $PWD/*.xbps
           xbps-rindex -c $PWD
           ls -la
-
-      # - name: checksum
-      #   working-directory: void-packages/hostdir/binpkgs/
-      #   run: |
-      #     sha256sum $(echo librewolf-*.${{ matrix.arch }}.xbps) | tee $(echo librewolf-*.${{ matrix.arch }}.xbps).sha256sum
-      #     sha512sum $(echo librewolf-*.${{ matrix.arch }}.xbps) | tee $(echo librewolf-*.${{ matrix.arch }}.xbps).sha512sum
 
       - name: checksum
         working-directory: void-packages/hostdir/binpkgs/
