@@ -50,31 +50,36 @@ jobs:
           ref: master
           path: void-packages
 
-      - name: Cache xbps-static and bootstrap
-        id: cache-void-packages
-        uses: actions/cache@v4
+      - name: Cache void-packages
+        uses: actions/cache@v3
         with:
           path: |
+            void-packages
             /opt/xbps
-            void-packages/masterdir-${{ matrix.arch }}
-            void-packages/hostdir
-          key: xbps-static-${{ matrix.arch }}-bootstrap-${{ hashFiles('void-packages/srcpkgs/*', 'void-packages/common/shlibs') }}
+          key: ${{ runner.os }}-void-packages-${{ hashFiles('**/common/shlibs', '**/srcpkgs/**') }}
 
-      - name: Prepare xbps-static
-        if: steps.cache-void-packages.outputs.cache-hit != 'true'
+      - name: Copy files and prepare environment
         run: |
-          mkdir -p /opt/xbps
-          curl -LO http://repo-default.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz
-          tar xvf xbps-static-latest.x86_64-musl.tar.xz -C /opt/xbps
-          rm xbps-static-latest.x86_64-musl.tar.xz
+          cat ${{ env.REPO_NAME }}/common/shlibs >> void-packages/common/shlibs
+          cp -rv ${{ env.REPO_NAME }}/srcpkgs/* void-packages/srcpkgs
 
-      - name: Set path
-        run: |
+          if [ ! -d "/opt/xbps" ]; then
+            mkdir -p /opt/xbps
+            curl -LO http://repo-default.voidlinux.org/static/xbps-static-latest.x86_64-musl.tar.xz
+            tar xvf xbps-static-latest.x86_64-musl.tar.xz -C /opt/xbps
+            rm xbps-static-latest.x86_64-musl.tar.xz
+          fi
+
           echo "/opt/xbps/usr/bin/" >> $GITHUB_PATH
+
+      - name: Cache binary bootstrap
+        uses: actions/cache@v3
+        with:
+          path: void-packages/masterdir-${{ matrix.arch }}
+          key: ${{ runner.os }}-binary-bootstrap-${{ matrix.arch }}-${{ hashFiles('void-packages/xbps-src') }}
 
       - name: Setup binary bootstrap
         working-directory: void-packages
-        if: steps.cache-void-packages.outputs.cache-hit != 'true'
         run: |
           ./xbps-src -m masterdir-${{ matrix.arch }} -A ${{ matrix.arch }} binary-bootstrap
 
@@ -107,8 +112,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.package }}-artifacts
-          path: ~/
+          path: ~/artifacts
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -130,7 +134,9 @@ jobs:
 
       - name: Extract and Add Packages
         run: |
-          tar -xvf ~/${{ env.PACKAGES_FILE }} -C ./
+          for artifact in ~/artifacts/*; do
+            tar -xvf "$artifact/${{ env.PACKAGES_FILE }}" -C ./
+          done
 
       - name: Commit and Push Changes
         run: |

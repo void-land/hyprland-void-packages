@@ -133,16 +133,17 @@ jobs:
          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} rofi-wayland
 
       - name: Retrieve private key
+        working-directory: $HOME
         run: |
-          cd ~
           curl -O https://raw.githubusercontent.com/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}/main/common/private.pem
 
       - name: sign
         working-directory: void-packages/hostdir/binpkgs/
         run: |
           ls -la
-          xbps-rindex --privkey ~/private.pem --sign --signedby "${{ env.REPO_NAME }}-github-action" $PWD
-          xbps-rindex --privkey ~/private.pem --sign-pkg ~/packages/*.xbps
+          echo "${{ secrets.PRIV_KEY }}" > private.pem
+          xbps-rindex --privkey private.pem --sign --signedby "${{ env.REPO_NAME }}-github-action" $PWD
+          xbps-rindex --privkey private.pem --sign-pkg *.xbps
 
       - name: checksum
         working-directory: void-packages/hostdir/binpkgs/
