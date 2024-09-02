@@ -2,9 +2,25 @@
 
 Welcome to the repository for building and installing [Hyprland](https://github.com/hyprwm/Hyprland) on Void Linux. Here, you'll find templates, binaries, and comprehensive instructions for a seamless installation experience.
 
+### Packages
+
+This repository provides Void Linux packages, including:
+- aquamarine
+- hyprland
+- hyprland-protocols
+- hyprlang
+- hyprcursor
+- hypridle
+- hyprlock
+- hyprpaper
+- hyprutils
+- swayosd
+- rofi-wayland
+- xdg-desktop-portal-hyprland
+
 ### Installation
 
-The simplest way to install Hyprland on Void Linux is by using our [repository](https://github.com/void-land/hyprland-void-packages). This repository includes binaries automatically built using GitHub Actions whenever a new commit is pushed.
+The simplest way to install Hyprland on Void Linux is by using our [repository](https://github.com/void-land/hyprland-void-packages). This repository includes binaries automatically built using GitHub Actions.
 
 #### Adding the Repository
 
@@ -36,22 +52,6 @@ xbps-query -Rs hypr
 
 To run Hyprland, you may need to install additional packages depending on your setup, such as a [session and seat manager](https://docs.voidlinux.org/config/session-management.html) and [graphics drivers](https://docs.voidlinux.org/config/graphical-session/graphics-drivers/index.html). Additionally, ensure that your user is added to the `_seatd` group.
 
-#### Note for Nvidia Users
-
-The `hyprland-nvidia` package is no longer necessary as of [version 0.33.0](https://github.com/hyprwm/Hyprland/releases/tag/v0.33.0). While Nvidia support is still unofficial, please refer to the [manual](https://wiki.hyprland.org/hyprland-wiki/pages/Nvidia/) for more information.
-
-### Additional Packages
-
-This repository also includes packages for:
-- hyprland
-- hypridle
-- hyprlock
-- hyprpaper
-- hyprlang
-- hyprutils
-- swayosd
-- xdg-desktop-portal-hyprland
-
 ### Manually Building Hyprland
 
 If you need to customize the build, follow these steps to manually build Hyprland:
@@ -75,7 +75,7 @@ cd ..
 3. **Clone hyprland-void-packages**:
 
 ```sh
-git clone https://github.com/void-land/hyprland-void-packages.git
+git clone https://github.com/void-land/hyprland-void-packages.git --depth 1
 cd hyprland-void-packages
 ```
 
@@ -98,5 +98,3 @@ cd ../void-packages
 ./xbps-src pkg hyprland
 sudo xbps-install -R hostdir/binpkgs hyprland
 ```
-
-By following these instructions, you'll have Hyprland up and running on your Void Linux system in no time. For more details, refer to the official documentation and the [Hyprland GitHub page](https://github.com/hyprwm/Hyprland).
