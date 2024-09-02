@@ -10,8 +10,8 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        arch: [x86_64]
-        # arch: [x86_64, x86_64-musl]
+        # arch: [x86_64]
+        arch: [x86_64, x86_64-musl]
     runs-on: ubuntu-latest
     env:
       XBPS_ALLOW_RESTRICTED: "yes"
