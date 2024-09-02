@@ -19,7 +19,11 @@ echo 'repository=https://github.com/void-land/hyprland-void-packages/releases/la
 Once the repository is added, you can install Hyprland like any other program:
 
 ```sh
-sudo xbps-install -S hyprland
+sudo xbps-install -S
+```
+
+```sh
+sudo xbps-install -Sy hyprland hyprland-devel aquamarine hyprcursor hypridle hyprland-protocols hyprlang hyprlock hyprpaper hyprutils hyprwayland-scanner xdg-desktop-portal-hyprland
 ```
 
 You can also search for all Hyprland-related packages:
@@ -27,20 +31,6 @@ You can also search for all Hyprland-related packages:
 ```sh
 xbps-query -Rs hypr
 ```
-
-During the first use, you will need to accept the repository's fingerprint with `xbps-install -S`.
-
-### Supported Architectures
-
-This repository provides binary packages for:
-- `x86_64-glibc`
-- `x86_64-musl`
-
-Update the URL in `/etc/xbps.d/hyprland-void.conf` to match your desired architecture.
-
-### Nightly Builds
-
-Nightly binary packages are available, built automatically at 00:00 UTC from the latest git commit. Templates for these builds are also provided, but you will need to manually force a rebuild each time as XBPS does not natively support automatic updates for git packages.
 
 ### Running Hyprland
 
@@ -53,6 +43,7 @@ The `hyprland-nvidia` package is no longer necessary as of [version 0.33.0](http
 ### Additional Packages
 
 This repository also includes packages for:
+- hyprland
 - hypridle
 - hyprlock
 - hyprpaper
