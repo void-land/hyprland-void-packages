@@ -15,6 +15,7 @@ homepage="https://github.com/lbonn/rofi"
 distfiles="https://github.com/lbonn/rofi/releases/download/${version}/rofi-${version}.tar.gz"
 checksum="025a390469008179eaffaa599e2eabbd81a77f7141d9038e008304673ba19843"
 replaces="rofi>=0"
+conflicts="rofi>=0"
 
 post_install() {
 	vlicense COPYING
