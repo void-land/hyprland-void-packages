@@ -62,6 +62,8 @@ jobs:
         run: |
           ./xbps-src -m masterdir-${{ matrix.arch }} -A ${{ matrix.arch }} binary-bootstrap
 
+      # ---------------------------------------------------------------------
+
       - name: build tomlplusplus
         working-directory: void-packages
         run: |
@@ -72,6 +74,8 @@ jobs:
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} sdbus-cpp
 
+      # ---------------------------------------------------------------------
+
       - name: build hyprutils
         working-directory: void-packages
         run: |
@@ -81,6 +85,21 @@ jobs:
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprlang
+
+      - name: build hyprcursor
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprcursor
+
+      - name: build hyprwayland-scanner
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprwayland-scanner
+
+      - name: build aquamarine
+        working-directory: void-packages
+        run: |
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} aquamarine
 
       - name: build hyprland
         working-directory: void-packages
@@ -96,16 +115,6 @@ jobs:
         working-directory: void-packages
         run: |
           ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} xdg-desktop-portal-hyprland
-
-      - name: build hyprcursor
-        working-directory: void-packages
-        run: |
-          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprcursor
-
-      - name: build hyprwayland-scanner
-        working-directory: void-packages
-        run: |
-          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} hyprwayland-scanner
 
       - name: build hypridle
         working-directory: void-packages
@@ -125,12 +134,12 @@ jobs:
       - name: build swayosd
         working-directory: void-packages
         run: |
-         ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} swayosd
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} swayosd
 
       - name: build rofi wayland
         working-directory: void-packages
         run: |
-         ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} rofi-wayland
+          ./xbps-src pkg -j$(nproc) -m masterdir-${{ matrix.arch }} rofi-wayland
 
       - name: sign
         working-directory: void-packages/hostdir/binpkgs/
