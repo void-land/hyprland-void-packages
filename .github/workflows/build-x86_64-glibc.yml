@@ -121,7 +121,7 @@ jobs:
       - name: Retrieve private key
         run: |
           cd ~
-          curl -O https://raw.githubusercontent.com/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}/main/pem/private.pem
+          curl -O https://raw.githubusercontent.com/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}/main/common/private.pem
 
       - name: Sign repository
         run: |
@@ -132,6 +132,7 @@ jobs:
       - name: Compress Packages
         run: |
           cd ~/packages
+          ls -la
           tar -czvf ${{ env.PACKAGES_FILE }} *
 
       - name: Upload artifact
@@ -140,41 +141,41 @@ jobs:
           name: ${{ env.REPO_NAME }}
           path: ~/packages/${{ env.PACKAGES_FILE }}
 
-  publish:
-    name: Pack and Publish
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.REPO_NAME }}
-          path: ~/
+  # publish:
+  #   name: Pack and Publish
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: ${{ env.REPO_NAME }}
+  #         path: ~/
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+  #     - name: Configure Git
+  #       run: |
+  #         git config user.name "github-actions[bot]"
+  #         git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Update or Create Repository Branch
-        run: |
-          if git ls-remote --exit-code --heads origin repository-x86_64-glibc; then
-            echo "Branch exists, deleting it"
-            git push origin -d repository-x86_64-glibc
-          else
-            echo "Branch does not exist, will create new"
-          fi
-          git switch --orphan repository-x86_64-glibc
+  #     - name: Update or Create Repository Branch
+  #       run: |
+  #         if git ls-remote --exit-code --heads origin repository-x86_64-glibc; then
+  #           echo "Branch exists, deleting it"
+  #           git push origin -d repository-x86_64-glibc
+  #         else
+  #           echo "Branch does not exist, will create new"
+  #         fi
+  #         git switch --orphan repository-x86_64-glibc
 
-      - name: Extract and Add Packages
-        run: |
-          tar -xvf ~/${{ env.PACKAGES_FILE }} -C ./
+  #     - name: Extract and Add Packages
+  #       run: |
+  #         tar -xvf ~/${{ env.PACKAGES_FILE }} -C ./
 
-      - name: Commit and Push Changes
-        run: |
-          git add -A
-          git commit -m "Upload latest packages to repository"
-          git push origin repository-x86_64-glibc
+  #     - name: Commit and Push Changes
+  #       run: |
+  #         git add -A
+  #         git commit -m "Upload latest packages to repository"
+  #         git push origin repository-x86_64-glibc
